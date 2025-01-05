@@ -24,6 +24,9 @@ class ProfileDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['total_posts'] = Post.objects.filter(author=user).count()
         # context['total_followers'] = ...
+        # My code for counting the followers
+
+        context['total_followers'] = Follower.objects.filter(following=user).count()
         if self.request.user.is_authenticated:
             context['you_follow'] = Follower.objects.filter(following=user, followed_by=self.request.user).exists()
         return context
@@ -64,5 +67,6 @@ class FollowView(LoginRequiredMixin, View):
 
         return JsonResponse({
             'success': True,
-            'wording': "Unfollow" if data['action'] == "follow" else "Follow"
+            'wording': "Unfollow" if data['action'] == "follow" else "Follow",
+            'total_followers': Follower.objects.filter(following=other_user).count(),
         })
